@@ -61,7 +61,7 @@ void loop() {
   delay(Wait);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
 
-  theaterChaseRainbow(Speed2);
+//  theaterChaseRainbow(Speed2);
 
   // Send a theater pixel chase in...
   //theaterChase(strip.Color(127, 127, 127), 50); // White
@@ -73,7 +73,7 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
 
-
+  colorWipeRainbow(0);
 
 }
 
@@ -156,18 +156,94 @@ void colorWipeQ(uint32_t c, uint8_t wait) {
 
   int lowbound = 0;
   int highbound = 9;
-  int slwdwn = 0;
+  int slwdwn = 1;
   int r = 0;
   int g = 0;
   int b = 0;
 
   void colorWipeRainbow(uint8_t wait) {
     for (uint16_t i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, r, g, b);
+      
       if (i >= lowbound && i <= highbound) {
+        if (slwdwn == 512 || i == 0) {
+          slwdwn = 1;
+        }
+        if (i == 0) {
+          r = 255;
+        }
+        if (i == 9) {
+          r = 204;
+          g = 51;
+        }
+        if (i == 18) {
+          r = 153;
+          g = 102;
+        }
+        if (i == 27) {
+          r = 102;
+          g = 153;
+        }
+        if (i == 36) {
+          r = 51;
+          g = 204;
+        }
+        if (i == 45) {
+          r = 0;
+          g = 255;
+        }
+        if (i == 54) {
+          g = 204;
+          b = 51;
+        }
+        if (i == 63) {
+          g = 153;
+          b = 102;
+        }
+        if (i == 72) {
+          g = 102;
+          b = 153;
+        }
+        if (i == 81) {
+          g = 51;
+          b = 204;
+        }
+        if (i == 90) {
+          g = 0;
+          b = 255;
+        }
+        if (i == 99) {
+          b = 204;
+          r = 51;
+        }
+        if (i == 108) {
+          b = 153;
+          r = 102;
+        }
+        if (i == 117) {
+          b = 102;
+          r = 153;
+        }
+        if (i == 126) {
+          b = 51;
+          r = 204;
+        }
+        strip.setPixelColor(i, r, g, b);
         delay(slwdwn);
-        slwdwn = slwdwn + 10;
+        slwdwn = slwdwn * 2;
+          if (i == highbound) {
+            lowbound = lowbound + 9;
+            highbound = highbound + 9;
+          }
+       //   strip.show();
       }
+      delay(wait);
+      strip.show();
     }
+    delay(1000);
+    r = 0;
+    g = 0;
+    b = 0;
+    lowbound = 0;
+    highbound = 9;
   }
 
