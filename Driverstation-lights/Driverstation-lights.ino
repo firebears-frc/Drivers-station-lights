@@ -46,7 +46,7 @@ void setup() {
 void loop() {
   // Some example procedures showing how to display to the pixels:
 
-
+  crossFade(0);
 
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -61,7 +61,7 @@ void loop() {
   delay(Wait);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
 
-//  theaterChaseRainbow(Speed2);
+  theaterChaseRainbow(Speed2);
 
   // Send a theater pixel chase in...
   //theaterChase(strip.Color(127, 127, 127), 50); // White
@@ -73,7 +73,7 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
 
-  colorWipeRainbow(0);
+  //  colorWipeRainbow(0);
 
 }
 
@@ -99,19 +99,21 @@ void theaterChase(uint32_t c, uint8_t wait) {
     for (int q = 0; q < 3; q++) {
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         strip.setPixelColor(i + q, c);  //turn every third pixel on
-        //   setStrips(&strip, &stripQ, i, c);
+        stripQ.setPixelColor(i - q, c);
       }
       strip.show();
+      stripQ.show();
 
       delay(wait);
 
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         strip.setPixelColor(i + q, 0);      //turn every third pixel off
-        //   setStrips(&strip, &stripQ, i, 0);
+        stripQ.setPixelColor(i - q, 0);
       }
     }
   }
 }
+
 
 //Theatre-style crawling lights with rainbow effect
 void theaterChaseRainbow(uint8_t wait) {
@@ -119,13 +121,16 @@ void theaterChaseRainbow(uint8_t wait) {
     for (int q = 0; q < 3; q++) {
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         strip.setPixelColor(i + q, Wheel( (i + j) % 255)); //turn every third pixel on
+        stripQ.setPixelColor(i + q, Wheel( ((i + 89) + j) % 255));
       }
       strip.show();
+      stripQ.show();
 
       delay(wait);
 
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         strip.setPixelColor(i + q, 0);      //turn every third pixel off
+        stripQ.setPixelColor(i + q, 0);
       }
     }
   }
@@ -154,96 +159,124 @@ void colorWipeQ(uint32_t c, uint8_t wait) {
   }
 }
 
-  int lowbound = 0;
-  int highbound = 9;
-  int slwdwn = 1;
-  int r = 0;
-  int g = 0;
-  int b = 0;
+int lowbound = 0;
+int highbound = 9;
+int slwdwn = 1;
+int r = 0;
+int g = 0;
+int b = 0;
 
-  void colorWipeRainbow(uint8_t wait) {
-    for (uint16_t i = 0; i < strip.numPixels(); i++) {
-      
-      if (i >= lowbound && i <= highbound) {
-        if (slwdwn == 512 || i == 0) {
-          slwdwn = 1;
-        }
-        if (i == 0) {
-          r = 255;
-        }
-        if (i == 9) {
-          r = 204;
-          g = 51;
-        }
-        if (i == 18) {
-          r = 153;
-          g = 102;
-        }
-        if (i == 27) {
-          r = 102;
-          g = 153;
-        }
-        if (i == 36) {
-          r = 51;
-          g = 204;
-        }
-        if (i == 45) {
-          r = 0;
-          g = 255;
-        }
-        if (i == 54) {
-          g = 204;
-          b = 51;
-        }
-        if (i == 63) {
-          g = 153;
-          b = 102;
-        }
-        if (i == 72) {
-          g = 102;
-          b = 153;
-        }
-        if (i == 81) {
-          g = 51;
-          b = 204;
-        }
-        if (i == 90) {
-          g = 0;
-          b = 255;
-        }
-        if (i == 99) {
-          b = 204;
-          r = 51;
-        }
-        if (i == 108) {
-          b = 153;
-          r = 102;
-        }
-        if (i == 117) {
-          b = 102;
-          r = 153;
-        }
-        if (i == 126) {
-          b = 51;
-          r = 204;
-        }
-        strip.setPixelColor(i, r, g, b);
-        delay(slwdwn);
-        slwdwn = slwdwn * 2;
-          if (i == highbound) {
-            lowbound = lowbound + 9;
-            highbound = highbound + 9;
-          }
-       //   strip.show();
+void colorWipeRainbow(uint8_t wait) {
+  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+
+    if (i >= lowbound && i <= highbound) {
+      if (slwdwn == 512 || i == 0) {
+        slwdwn = 1;
       }
-      delay(wait);
+      if (i == 0) {
+        r = 255;
+      }
+      if (i == 9) {
+        r = 204;
+        g = 51;
+      }
+      if (i == 18) {
+        r = 153;
+        g = 102;
+      }
+      if (i == 27) {
+        r = 102;
+        g = 153;
+      }
+      if (i == 36) {
+        r = 51;
+        g = 204;
+      }
+      if (i == 45) {
+        r = 0;
+        g = 255;
+      }
+      if (i == 54) {
+        g = 204;
+        b = 51;
+      }
+      if (i == 63) {
+        g = 153;
+        b = 102;
+      }
+      if (i == 72) {
+        g = 102;
+        b = 153;
+      }
+      if (i == 81) {
+        g = 51;
+        b = 204;
+      }
+      if (i == 90) {
+        g = 0;
+        b = 255;
+      }
+      if (i == 99) {
+        b = 204;
+        r = 51;
+      }
+      if (i == 108) {
+        b = 153;
+        r = 102;
+      }
+      if (i == 117) {
+        b = 102;
+        r = 153;
+      }
+      if (i == 126) {
+        b = 51;
+        r = 204;
+      }
+      strip.setPixelColor(i, r, g, b);
+      delay(slwdwn);
+      slwdwn = slwdwn * 2;
+      if (i == highbound) {
+        lowbound = lowbound + 9;
+        highbound = highbound + 9;
+      }
       strip.show();
     }
-    delay(1000);
-    r = 0;
-    g = 0;
-    b = 0;
-    lowbound = 0;
-    highbound = 9;
+    delay(wait);
   }
+  delay(1000);
+  r = 0;
+  g = 0;
+  b = 0;
+  lowbound = 0;
+  highbound = 9;
+}
+
+void crossFade(uint8_t wait) {
+  g = 255;
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, 0, g, 0);
+    strip.show(); //runs a green light around the whole strip
+  }
+  for (int b = 0; b < 255; b++) {
+    for (int i = 0; i < 129; i++) {
+      strip.setPixelColor(i, 0, g, b);
+    }
+    strip.show();
+  }
+  b = 255;
+  for (int g = 255; g > 0; g--) {
+    for (int i = 0; i < 129; i++) {
+      strip.setPixelColor(i, 0, g, b);
+    }
+    strip.show();
+  }
+  g = 0;
+  b = 255;
+  for (int r = 0; r < 255; r++) {
+    for (int i = 0; i < 129; i++) {
+      strip.setPixelColor(i, r, g, b);
+    }
+    strip.show();
+  }
+}
 
