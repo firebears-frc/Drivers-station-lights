@@ -46,7 +46,7 @@ void setup() {
 void loop() {
   // Some example procedures showing how to display to the pixels:
 
-  crossFade(0);
+
 
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -59,7 +59,8 @@ void loop() {
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   colorWipe(strip.Color(0, 225, 0), Speed); //Green
   delay(Wait);
-  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank  
+  crossFade(0);
 
   theaterChaseRainbow(Speed2);
 
@@ -252,31 +253,69 @@ void colorWipeRainbow(uint8_t wait) {
 }
 
 void crossFade(uint8_t wait) {
-  g = 255;
-  for (int i = 0; i < strip.numPixels(); i++) {
-    strip.setPixelColor(i, 0, g, 0);
-    strip.show(); //runs a green light around the whole strip
-  }
-  for (int b = 0; b < 255; b++) {
-    for (int i = 0; i < 129; i++) {
-      strip.setPixelColor(i, 0, g, b);
+  r = 200;
+  g = 55;
+  b = 0;
+
+  colorWipe(strip.Color(r, g, b), Speed); //Blank
+  for (int r = 200; r > 0 && g < 255; r-- && g++) {
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, r, g, b); //fades to green
+      stripQ.setPixelColor(i, r, g, b);
     }
     strip.show();
+    stripQ.show();
+  }
+  delay(250);
+  r = 0;
+  g = 255;
+  for (int b = 0; b < 255; b++) {
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 0, g, b); //fades to blue green
+      stripQ.setPixelColor(i, r, g, b);
+    }
+    strip.show();
+    stripQ.show();
   }
   b = 255;
+  r = 0;
   for (int g = 255; g > 0; g--) {
-    for (int i = 0; i < 129; i++) {
-      strip.setPixelColor(i, 0, g, b);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, r, g, b); //fades green back to only blue
+      stripQ.setPixelColor(i, r, g, b);
     }
     strip.show();
+    stripQ.show();
   }
   g = 0;
   b = 255;
   for (int r = 0; r < 255; r++) {
-    for (int i = 0; i < 129; i++) {
-      strip.setPixelColor(i, r, g, b);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, r, g, b); //fades to purple
+      stripQ.setPixelColor(i, r, g, b);
     }
     strip.show();
+    stripQ.show();
   }
+  r = 255;
+  for (int b = 255; b > 0; b--) {
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, r, g, b); //fades blue back to only red
+      stripQ.setPixelColor(i, r, g, b);
+    }
+    strip.show();
+    stripQ.show();
+  }
+  r = 255;
+  b = 0;
+  for (int g = 0; g < 55 && r >200; g++ && r--) {
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, r, g, b); //fades to orange
+      stripQ.setPixelColor(i, r, g, b);
+    }
+    strip.show();
+    stripQ.show(); 
+  }
+  delay(500);
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
 }
-
