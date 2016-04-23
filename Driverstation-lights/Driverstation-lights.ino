@@ -44,9 +44,8 @@ void setup() {
 }
 
 void loop() {
-  // Some example procedures showing how to display to the pixels:
 
-
+   
 
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -59,13 +58,14 @@ void loop() {
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   colorWipe(strip.Color(0, 225, 0), Speed); //Green
   delay(Wait);
-  colorWipe(strip.Color(0, 0, 0), Speed); //Blank  
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
+  colorWipePixRainbow(0);
   crossFade(0);
+  colorWipeRainbow(Speed);
 
   theaterChaseRainbow(Speed2);
 
   // Send a theater pixel chase in...
-  //theaterChase(strip.Color(127, 127, 127), 50); // White
   theaterChase(strip.Color(0, 0, 255), Speed2); // Blue
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet, sweet, orange
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
@@ -73,8 +73,6 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet, sweet, orange
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
-
-  //  colorWipeRainbow(0);
 
 }
 
@@ -122,7 +120,7 @@ void theaterChaseRainbow(uint8_t wait) {
     for (int q = 0; q < 3; q++) {
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         strip.setPixelColor(i + q, Wheel( (i + j) % 255)); //turn every third pixel on
-        stripQ.setPixelColor(i + q, Wheel( ((i + 89) + j) % 255));
+        stripQ.setPixelColor(i + q, Wheel(((i + 89) + j) % 255));
       }
       strip.show();
       stripQ.show();
@@ -167,89 +165,22 @@ int r = 0;
 int g = 0;
 int b = 0;
 
-void colorWipeRainbow(uint8_t wait) {
-  for (uint16_t i = 0; i < strip.numPixels(); i++) {
+void colorWipeRainbow (uint8_t wait) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel(i));
+      setStrips(&strip, &stripQ, i, Wheel(i));
+      delay(wait);
+    } delay(1000);
+}
 
-    if (i >= lowbound && i <= highbound) {
-      if (slwdwn == 512 || i == 0) {
-        slwdwn = 1;
-      }
-      if (i == 0) {
-        r = 255;
-      }
-      if (i == 9) {
-        r = 204;
-        g = 51;
-      }
-      if (i == 18) {
-        r = 153;
-        g = 102;
-      }
-      if (i == 27) {
-        r = 102;
-        g = 153;
-      }
-      if (i == 36) {
-        r = 51;
-        g = 204;
-      }
-      if (i == 45) {
-        r = 0;
-        g = 255;
-      }
-      if (i == 54) {
-        g = 204;
-        b = 51;
-      }
-      if (i == 63) {
-        g = 153;
-        b = 102;
-      }
-      if (i == 72) {
-        g = 102;
-        b = 153;
-      }
-      if (i == 81) {
-        g = 51;
-        b = 204;
-      }
-      if (i == 90) {
-        g = 0;
-        b = 255;
-      }
-      if (i == 99) {
-        b = 204;
-        r = 51;
-      }
-      if (i == 108) {
-        b = 153;
-        r = 102;
-      }
-      if (i == 117) {
-        b = 102;
-        r = 153;
-      }
-      if (i == 126) {
-        b = 51;
-        r = 204;
-      }
-      strip.setPixelColor(i, r, g, b);
-      delay(slwdwn);
-      slwdwn = slwdwn * 2;
-      if (i == highbound) {
-        lowbound = lowbound + 9;
-        highbound = highbound + 9;
-      }
-      strip.show();
+void colorWipePixRainbow (uint8_t wait) {
+  for (int i = 0; i <= strip.numPixels(); i++) {
+    for (int c = 0; c < 255; c+=10) {
+      setStrips(&strip, &stripQ, i, Wheel(c + i));
+      setStrips(&strip, &stripQ, strip.numPixels() - i-1, Wheel(c + i));
     }
-    delay(wait);
   }
-  delay(1000);
-  r = 0;
-  g = 0;
-  b = 0;
-  lowbound = 0;
-  highbound = 9;
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
 }
 
 void crossFade(uint8_t wait) {
@@ -308,13 +239,13 @@ void crossFade(uint8_t wait) {
   }
   r = 255;
   b = 0;
-  for (int g = 0; g < 55 && r >200; g++ && r--) {
+  for (int g = 0; g < 55 && r > 200; g++ && r--) {
     for (int i = 0; i < strip.numPixels(); i++) {
       strip.setPixelColor(i, r, g, b); //fades to orange
       stripQ.setPixelColor(i, r, g, b);
     }
     strip.show();
-    stripQ.show(); 
+    stripQ.show();
   }
   delay(500);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
