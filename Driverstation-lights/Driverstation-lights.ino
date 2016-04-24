@@ -3,7 +3,7 @@
 #include <avr/power.h>
 #endif
 
-#define PIN 1
+#define PIN 5
 #define PINQ 4
 #define NUM_PIXELS 129
 #define NUM_PIXELSQ 32
@@ -27,6 +27,12 @@ int Speed = 0;
 int Speed2 = 75;
 int Wait = 750;
 
+const int blueSwitch = 2;
+const int redSwitch = 3;
+volatile int blueSensorValue = digitalRead(blueSwitch);
+volatile int redSensorValue = digitalRead(redSwitch);
+
+
 void setup() {
   /* This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
     #if defined (__AVR_ATtiny85__)
@@ -34,19 +40,25 @@ void setup() {
     #endif
      End of Trinket special code
   */
+  pinMode(blueSwitch, INPUT_PULLUP);
+  pinMode(redSwitch, INPUT_PULLUP);
+  attachInterrupt (digitalPinToInterrupt(blueSwitch), loop, FALLING);
+  attachInterrupt (digitalPinToInterrupt(redSwitch), loop, FALLING);
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  strip.setBrightness(125);
+  strip.setBrightness(120);
   stripQ.begin();
   stripQ.show(); // Initialize all pixels to 'off'
-  stripQ.setBrightness(125);
+  stripQ.setBrightness(120);
 }
 
 void loop() {
-
-   
-
+  AllianceSelector();
+  
+  
+  
+  colorWipePixRainbow();
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
@@ -59,10 +71,9 @@ void loop() {
   colorWipe(strip.Color(0, 225, 0), Speed); //Green
   delay(Wait);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
-  colorWipePixRainbow(0);
+
   crossFade(0);
   colorWipeRainbow(Speed);
-
   theaterChaseRainbow(Speed2);
 
   // Send a theater pixel chase in...
@@ -73,7 +84,6 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet, sweet, orange
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
-
 }
 
 void setStrips(Adafruit_NeoPixel* strip1, Adafruit_NeoPixel* strip2, int pixel, uint32_t color) {
@@ -167,17 +177,19 @@ int b = 0;
 
 void colorWipeRainbow (uint8_t wait) {
   for (int i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel(i));
-      setStrips(&strip, &stripQ, i, Wheel(i));
-      delay(wait);
-    } delay(1000);
+    strip.setPixelColor(i, Wheel(i));
+    setStrips(&strip, &stripQ, i, Wheel(i));
+    delay(wait);
+  } delay(1000);
 }
 
-void colorWipePixRainbow (uint8_t wait) {
+void colorWipePixRainbow () {
   for (int i = 0; i <= strip.numPixels(); i++) {
-    for (int c = 0; c < 255; c+=10) {
+    for (int c = 0; c < 255; c += 10) {
       setStrips(&strip, &stripQ, i, Wheel(c + i));
-      setStrips(&strip, &stripQ, strip.numPixels() - i-1, Wheel(c + i));
+      setStrips(&strip, &stripQ, strip.numPixels() - i - 1, Wheel(c + i));
+      setStrips(&strip, &stripQ, i + strip.numPixels() / 2, Wheel(c + i));
+      setStrips(&strip, &stripQ, strip.numPixels() / 2 - i - 1, Wheel(c + i));
     }
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
@@ -250,3 +262,30 @@ void crossFade(uint8_t wait) {
   delay(500);
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
 }
+
+
+void Red() {
+  while (digitalRead(redSwitch) == LOW) {
+    colorWipe(strip.Color(255, 0, 0), Speed);
+  }
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
+  loop();
+}
+
+void Blue() {
+  while (digitalRead(blueSwitch) == LOW) {
+    colorWipe(strip.Color(0, 0, 255), Speed);
+  }
+  colorWipe(strip.Color(0, 0, 0), Speed); //Blank
+  loop();
+}
+
+void AllianceSelector() {
+  if (digitalRead(blueSwitch) == LOW) {
+    Blue();
+  }
+  if (digitalRead(redSwitch) == LOW) {
+    Red();
+  }
+}
+
