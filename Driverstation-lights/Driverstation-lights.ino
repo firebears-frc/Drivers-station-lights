@@ -26,6 +26,7 @@ Adafruit_NeoPixel stripQ = Adafruit_NeoPixel(NUM_PIXELSQ, PINQ, NEO_GRB + NEO_KH
 int Speed = 0;
 int Speed2 = 75;
 int Wait = 750;
+int FireLength = 250;
 
 const int blueSwitch = 2;
 const int redSwitch = 3;
@@ -55,9 +56,10 @@ void setup() {
 
 void loop() {
   AllianceSelector();
-  
-  
-  
+
+
+
+  Fire(FireLength);
   colorWipePixRainbow();
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -84,6 +86,7 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet, sweet, orange
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
+
 }
 
 void setStrips(Adafruit_NeoPixel* strip1, Adafruit_NeoPixel* strip2, int pixel, uint32_t color) {
@@ -188,8 +191,8 @@ void colorWipePixRainbow () {
     for (int c = 0; c < 255; c += 10) {
       setStrips(&strip, &stripQ, i, Wheel(c + i));
       setStrips(&strip, &stripQ, strip.numPixels() - i - 1, Wheel(c + i));
-      setStrips(&strip, &stripQ, i + strip.numPixels() / 2, Wheel(c + i));
-      setStrips(&strip, &stripQ, strip.numPixels() / 2 - i - 1, Wheel(c + i));
+      setStrips(&strip, &stripQ, i + 57, Wheel(c + i));
+      setStrips(&strip, &stripQ, 57 - i - 1, Wheel(c + i));
     }
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
@@ -266,7 +269,7 @@ void crossFade(uint8_t wait) {
 
 void Red() {
   while (digitalRead(redSwitch) == LOW) {
-    colorWipe(strip.Color(255, 0, 0), Speed);
+    colorWipe(strip.Color(150, 0, 0), Speed);
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   loop();
@@ -287,5 +290,77 @@ void AllianceSelector() {
   if (digitalRead(redSwitch) == LOW) {
     Red();
   }
+}
+
+void Fire(uint8_t Length) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    r = rand() % 106 + 150;
+    g = rand() % 125;
+    int      k = rand() % i;
+    strip.setPixelColor(i, r, g, b);
+    strip.setPixelColor(k, r, g, b);
+    r = rand() % 106 + 150;
+    g = rand() % 125;
+    k = rand() % i;
+    stripQ.setPixelColor(120 - i, r, g, b);
+    stripQ.setPixelColor(120 - k, r, g, b);
+    strip.show();
+    stripQ.show();
+    delay(10);
+  }
+  for (int j = 0; j < Length; j++) {
+    r = rand() % 106 + 150;
+    g = rand() % 125;
+    int   i = rand() % strip.numPixels() ;
+    strip.setPixelColor(i, r, g, b);
+    strip.show();
+    delay(10);
+  }
+  for (int i = 129; i > 0; i--) {
+    r = rand() % 106 + 150;
+    g = rand() % 125;
+int    k = rand() % i;
+    strip.setPixelColor(i, 0, 0, 0); //Blanks out the pixels in a colorWipe while the remaining ones still flicker
+    strip.setPixelColor(k, r, g, b); //Remaining pixels
+    r = rand() % 106 + 150;
+    g = rand() % 125;
+    k = rand() % i;
+    stripQ.setPixelColor(120 - i, 0, 0, 0); //Same as above, just with stripQ
+    stripQ.setPixelColor(120 - k, r, g, b);
+    strip.show();
+    stripQ.show();
+    delay(10);
+  }
+  delay(100);
+}
+
+void Candy() {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    r = rand() % 256;
+    g = rand() % 256;
+    r = rand() % 256;
+    int k = rand() % i;
+    strip.setPixelColor(i, r, g, b);
+    strip.setPixelColor(k, r, g, b);
+    r = rand() % 256;
+    g = rand() % 256;
+    r = rand() % 256;
+    k = rand() % i;
+    stripQ.setPixelColor(120 - i, r, g, b);
+    stripQ.setPixelColor(120 - k, r, g, b);
+    strip.show();
+    stripQ.show();
+    delay(10);
+  }
+  for (int j = 0; j < 150; j++) {
+    r = rand() % 256;
+    g = rand() % 256;
+    b = rand() % 256;
+    int  i = rand() % strip.numPixels();
+    strip.setPixelColor(i, r, g, b);
+    strip.show();
+    delay(10);
+  }
+  colorWipe(strip.Color(0, 0, 0), Speed);
 }
 
