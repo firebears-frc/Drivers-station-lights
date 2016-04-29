@@ -26,7 +26,6 @@ Adafruit_NeoPixel stripQ = Adafruit_NeoPixel(NUM_PIXELSQ, PINQ, NEO_GRB + NEO_KH
 int Speed = 0;
 int Speed2 = 75;
 int Wait = 750;
-int FireLength = 250;
 
 const int blueSwitch = 2;
 const int redSwitch = 3;
@@ -59,7 +58,7 @@ void loop() {
 
 
 
-  Fire(FireLength);
+  Fire();
   colorWipePixRainbow();
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -89,10 +88,14 @@ void loop() {
 
 }
 
-void setStrips(Adafruit_NeoPixel* strip1, Adafruit_NeoPixel* strip2, int pixel, uint32_t color) {
-  strip1->setPixelColor(pixel, color);
-  if (pixel <= 120 && pixel >= 88) {
-    strip2->setPixelColor(120 - pixel, color);
+void setStrips(Adafruit_NeoPixel* strip1, Adafruit_NeoPixel* strip2, int i, uint32_t c) {
+  int  h = 119 - i;
+  strip1->setPixelColor(i, c);
+  if (i <= 120 && i >= 88) {
+    if (h < 19) {
+      h = h + 1;
+    }
+    strip2->setPixelColor(h, c);
   }
   strip2->show();
   strip1->show();
@@ -277,7 +280,7 @@ void Red() {
 
 void Blue() {
   while (digitalRead(blueSwitch) == LOW) {
-    colorWipe(strip.Color(0, 0, 255), Speed);
+    colorWipe(strip.Color(0, 0, 150), Speed);
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   loop();
@@ -292,7 +295,7 @@ void AllianceSelector() {
   }
 }
 
-void Fire(uint8_t Length) {
+void Fire() {
   for (int i = 0; i < strip.numPixels(); i++) {
     r = rand() % 106 + 150;
     g = rand() % 125;
@@ -302,31 +305,30 @@ void Fire(uint8_t Length) {
     r = rand() % 106 + 150;
     g = rand() % 125;
     k = rand() % i;
-    stripQ.setPixelColor(120 - i, r, g, b);
-    stripQ.setPixelColor(120 - k, r, g, b);
+    stripQ.setPixelColor(119 - i, r, g, b);
+    stripQ.setPixelColor(119 - k, r, g, b);
     strip.show();
     stripQ.show();
     delay(10);
   }
-  for (int j = 0; j < Length; j++) {
+  for (int j = 0; j < 2500; j++) {
     r = rand() % 106 + 150;
     g = rand() % 125;
     int   i = rand() % strip.numPixels() ;
     strip.setPixelColor(i, r, g, b);
     strip.show();
-    delay(10);
   }
   for (int i = 129; i > 0; i--) {
     r = rand() % 106 + 150;
     g = rand() % 125;
-int    k = rand() % i;
+    int    k = rand() % i;
     strip.setPixelColor(i, 0, 0, 0); //Blanks out the pixels in a colorWipe while the remaining ones still flicker
     strip.setPixelColor(k, r, g, b); //Remaining pixels
     r = rand() % 106 + 150;
     g = rand() % 125;
     k = rand() % i;
-    stripQ.setPixelColor(120 - i, 0, 0, 0); //Same as above, just with stripQ
-    stripQ.setPixelColor(120 - k, r, g, b);
+    stripQ.setPixelColor(119 - i, 0, 0, 0); //Same as above, just with stripQ
+    stripQ.setPixelColor(119 - k, r, g, b);
     strip.show();
     stripQ.show();
     delay(10);
@@ -346,8 +348,8 @@ void Candy() {
     g = rand() % 256;
     r = rand() % 256;
     k = rand() % i;
-    stripQ.setPixelColor(120 - i, r, g, b);
-    stripQ.setPixelColor(120 - k, r, g, b);
+    stripQ.setPixelColor(119 - i, r, g, b);
+    stripQ.setPixelColor(119 - k, r, g, b);
     strip.show();
     stripQ.show();
     delay(10);
@@ -364,3 +366,55 @@ void Candy() {
   colorWipe(strip.Color(0, 0, 0), Speed);
 }
 
+void Pulse(uint32_t c) {
+  for (int j = 0; j < 10; j++) { //does 10 cycles of pulsing
+    for (int i = 0; i < (strip.numPixels() + 5); i++) {
+      setStrips(&strip, &stripQ, i, c);
+      setStrips(&strip, &stripQ, i - 1, c / 2);
+      setStrips(&strip, &stripQ, i - 2, c / 4);
+      setStrips(&strip, &stripQ, i - 3, c / 8);
+      setStrips(&strip, &stripQ, i - 4, c / 16);
+    }
+  }
+}
+
+void Flag(uint8_t wait) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    if (i < strip.numPixels() / 3) {
+      setStrips(&strip, &stripQ, i, strip.Color(255, 0, 0));
+    }
+    if (i > strip.numPixels() / 3 && i < 2 * strip.numPixels() / 3) {
+      setStrips(&strip, &stripQ, i, strip.Color(255, 255, 255));
+    }
+    if (i > 2 * strip.numPixels() / 3 && i < strip.numPixels()) {
+      setStrips(&strip, &stripQ, i, strip.Color(0, 0, 255));
+    }
+  }
+  for (int j = 0; j < 10; j++) { //do 10 cycles of chasing
+    for (int q = 0; q < 3; q++) {
+      for (int i = 0; i < strip.numPixels(); i = i + 3) {
+        if (i < strip.numPixels() / 3) {
+          strip.setPixelColor(i + q, strip.Color(255, 0, 0));
+          stripQ.setPixelColor(i - q, strip.Color(0, 0, 0));
+        }
+        if (i > strip.numPixels() / 3 && i < 2*strip.numPixels()/3) {
+          strip.setPixelColor(i + q, strip.Color(85, 85, 85));
+          stripQ.setPixelColor(i - q, strip.Color(0, 0, 0));
+        }
+        if (i>2*strip.numPixels()/3) {
+          strip.setPixelColor(i + q, strip.Color(0, 0, 255));
+          strip.setPixelColor(i - q, strip.Color(0, 0, 255));
+        }
+      }
+      strip.show();
+      stripQ.show();
+
+      delay(wait);
+
+      for (int i = 0; i < strip.numPixels(); i = i + 3) {
+        strip.setPixelColor(i + q, 0);      //turn every third pixel off
+        stripQ.setPixelColor(i - q, 0);
+      }
+    }
+  }
+}
