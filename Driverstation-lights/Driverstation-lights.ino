@@ -47,18 +47,21 @@ void setup() {
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  strip.setBrightness(120);
+  strip.setBrightness(20);
   stripQ.begin();
   stripQ.show(); // Initialize all pixels to 'off'
-  stripQ.setBrightness(120);
+  stripQ.setBrightness(20);
 }
 
 void loop() {
   AllianceSelector();
 
-
+  FIRST(Speed2);
+//  TwoColorWheel(strip.Color(255, 0, 0), strip.Color(200, 46, 0));
 
   Fire();
+  RainbowPincers();
+  Heartbeat();
   colorWipePixRainbow();
   colorWipe(strip.Color(255, 0, 0), Speed); // Red
   delay(Wait);
@@ -85,7 +88,7 @@ void loop() {
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet, sweet, orange
   theaterChase(strip.Color(200, 46, 0), Speed2); // Sweet orange
   theaterChase(strip.Color(255, 0, 0), Speed2); // Red
-
+  Pulse(255);
 }
 
 void setStrips(Adafruit_NeoPixel* strip1, Adafruit_NeoPixel* strip2, int i, uint32_t c) {
@@ -272,7 +275,7 @@ void crossFade(uint8_t wait) {
 
 void Red() {
   while (digitalRead(redSwitch) == LOW) {
-    colorWipe(strip.Color(150, 0, 0), Speed);
+    colorWipe(strip.Color(100, 0, 0), Speed);
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   loop();
@@ -280,7 +283,7 @@ void Red() {
 
 void Blue() {
   while (digitalRead(blueSwitch) == LOW) {
-    colorWipe(strip.Color(0, 0, 150), Speed);
+    colorWipe(strip.Color(0, 0, 100), Speed);
   }
   colorWipe(strip.Color(0, 0, 0), Speed); //Blank
   loop();
@@ -367,18 +370,19 @@ void Candy() {
 }
 
 void Pulse(uint32_t c) {
-  for (int j = 0; j < 10; j++) { //does 10 cycles of pulsing
+  for (int j = 0; j < 4; j++) { //does 10 cycles of pulsing
     for (int i = 0; i < (strip.numPixels() + 5); i++) {
-      setStrips(&strip, &stripQ, i, c);
-      setStrips(&strip, &stripQ, i - 1, c / 2);
-      setStrips(&strip, &stripQ, i - 2, c / 4);
-      setStrips(&strip, &stripQ, i - 3, c / 8);
-      setStrips(&strip, &stripQ, i - 4, c / 16);
+      setStrips(&strip, &stripQ, i, strip.Color(0, c, 0));
+      setStrips(&strip, &stripQ, i - 1, strip.Color(0, c / 2, 0));
+      setStrips(&strip, &stripQ, i - 2, strip.Color(0, c / 4, 0));
+      setStrips(&strip, &stripQ, i - 3, strip.Color(0, c / 8, 0));
+      setStrips(&strip, &stripQ, i - 4, strip.Color(0, c / 16, 0));
+      setStrips(&strip, &stripQ, i - 5, 0);
     }
   }
 }
 
-void Flag(uint8_t wait) {
+void FIRST(uint8_t wait) {
   for (int i = 0; i < strip.numPixels(); i++) {
     if (i < strip.numPixels() / 3) {
       setStrips(&strip, &stripQ, i, strip.Color(255, 0, 0));
@@ -390,20 +394,20 @@ void Flag(uint8_t wait) {
       setStrips(&strip, &stripQ, i, strip.Color(0, 0, 255));
     }
   }
-  for (int j = 0; j < 10; j++) { //do 10 cycles of chasing
+  for (int j = 0; j < 100; j++) { //do 10 cycles of chasing
     for (int q = 0; q < 3; q++) {
       for (int i = 0; i < strip.numPixels(); i = i + 3) {
         if (i < strip.numPixels() / 3) {
           strip.setPixelColor(i + q, strip.Color(255, 0, 0));
           stripQ.setPixelColor(i - q, strip.Color(0, 0, 0));
         }
-        if (i > strip.numPixels() / 3 && i < 2*strip.numPixels()/3) {
+        if (i > strip.numPixels() / 3 && i < 2 * strip.numPixels() / 3) {
           strip.setPixelColor(i + q, strip.Color(85, 85, 85));
           stripQ.setPixelColor(i - q, strip.Color(0, 0, 0));
         }
-        if (i>2*strip.numPixels()/3) {
+        if (i > (2 * strip.numPixels() / 3)) {
           strip.setPixelColor(i + q, strip.Color(0, 0, 255));
-          strip.setPixelColor(i - q, strip.Color(0, 0, 255));
+          stripQ.setPixelColor(strip.numPixels() - (i - q), strip.Color(0, 0, 255));
         }
       }
       strip.show();
@@ -417,4 +421,71 @@ void Flag(uint8_t wait) {
       }
     }
   }
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, 0, 0, 0);
+    stripQ.setPixelColor(i, 0, 0, 0);
+  }
+  strip.show();
+  stripQ.show();
 }
+
+void Heartbeat() {
+  for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 25, 0, 0);
+    }
+    strip.show();
+    delay(1000);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 180, 0, 0);
+    }
+    strip.show();
+    delay(50);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 25, 0, 0);
+    }
+    strip.show();
+    delay(75);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 180, 0, 0);
+    }
+    strip.show();
+    delay(50);
+    for (int i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, 25, 0, 0);
+    }
+    strip.show();
+    delay(200);
+  }
+}
+
+void RainbowPincers() {
+  for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < (strip.numPixels() + 1) / 2; i++) {
+      strip.setPixelColor(i, Wheel(i));
+      setStrips(&strip, &stripQ, i, Wheel(i));
+      strip.setPixelColor(strip.numPixels() - i, Wheel(i));
+      setStrips(&strip, &stripQ, strip.numPixels() - i, Wheel(i));
+    }
+    for (int i = (strip.numPixels() / 2) + 1; i > 0; i--) {
+      strip.setPixelColor(i, Wheel(i));
+      setStrips(&strip, &stripQ, i, 0);
+      strip.setPixelColor(strip.numPixels() - i, 0);
+      setStrips(&strip, &stripQ, strip.numPixels() - i, 0);
+    }
+  }
+}
+
+void TwoColorWheel(uint32_t a, uint32_t b) {
+  for (int q = 0; q < 3; q++) {
+    for (int i = 0; i < strip.numPixels(); i = + 2) {
+      strip.setPixelColor(i + q, a);
+      strip.setPixelColor(i + 1 + q, b);
+      stripQ.setPixelColor(i - q, a);
+      stripQ.setPixelColor((i+1) -q, b);
+    }
+    strip.show();
+    stripQ.show();
+  }
+}
+
